@@ -1,0 +1,11 @@
+---
+# defaults file for keycloak
+
+keycloak_version: 1.4.0.Final
+
+keycloak_base_download_url: http://downloads.jboss.org/keycloak
+keycloak_name: keycloak-overlay-{{ keycloak_version }}
+keycloak_download_file: "{{ keycloak_name }}.tar.gz"
+keycloak_download_url: "{{ keycloak_base_download_url }}/\
+                        {{ keycloak_version }}/{{ keycloak_download_file }}"
+keycloak_download_dir: /tmp

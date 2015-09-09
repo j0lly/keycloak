@@ -1,0 +1,25 @@
+---
+# tasks file for keycloak
+
+- name: Check keycloak installation
+  stat: path={{ wildfly_dir }}/bin/keycloak-install.cli
+  register: keycloak_installation
+  changed_when: not keycloak_installation.stat.exists
+
+- name: Download keycloak tar file
+  get_url: dest={{ keycloak_download_dir }} url={{ keycloak_download_url }}
+  when: not keycloak_installation.stat.exists
+
+- name: Unarchive downloaded file
+  unarchive: src={{ keycloak_download_dir }}/{{ keycloak_download_file }}
+             dest={{ wildfly_dir }} copy=no
+  when: not keycloak_installation.stat.exists
+
+- name: Change wildfly config file
+  lineinfile: dest={{ wildfly_conf_dir }}/wildfly.conf regexp=^JBOSS_CONFIG
+              line=JBOSS_CONFIG=standalone-keycloak.xml
+  notify: restart wildfly
+
+- name: Change wildfly binary permissions
+  file: path={{ wildfly_dir }} owner=wildfly group=wildfly mode=0750
+        recurse=yes
