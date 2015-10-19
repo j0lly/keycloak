@@ -12,7 +12,8 @@
 
 - name: Unarchive downloaded file
   unarchive: src={{ keycloak_download_dir }}/{{ keycloak_download_file }}
-             dest={{ wildfly_dir }} copy=no
+             dest={{ wildfly_dir }} copy=no owner=wildfly group=wildfly
+             mode=0750
   when: not keycloak_installation.stat.exists
 
 - name: Add extension to Wildfly's configuration file
@@ -23,7 +24,9 @@
     owner: wildfly
     group: wildfly
     mode: 0750
-  notify: restart wildfly
+  notify:
+    - restart wildfly
+    - change standalone data mode
 
 - name: Add subsytem to Wildfly's configuration file
   lineinfile:
@@ -35,7 +38,9 @@
     owner: wildfly
     group: wildfly
     mode: 0750
-  notify: restart wildfly
+  notify:
+    - restart wildfly
+    - change standalone data mode
 
 - name: Add default datasource
   lineinfile:
@@ -55,8 +60,6 @@
     owner: wildfly
     group: wildfly
     mode: 0750
-  notify: restart wildfly
-
-- name: Change wildfly binary permissions
-  file: path={{ wildfly_dir }} owner=wildfly group=wildfly mode=0750
-        recurse=yes
+  notify:
+    - restart wildfly
+    - change standalone data mode
