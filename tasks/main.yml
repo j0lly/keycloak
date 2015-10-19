@@ -12,8 +12,8 @@
 
 - name: Unarchive downloaded file
   unarchive: src={{ keycloak_download_dir }}/{{ keycloak_download_file }}
-             dest={{ wildfly_dir }} copy=no owner=wildfly group=wildfly
-             mode=0750
+             dest={{ wildfly_dir }} copy=no mode=0750
+             owner={{ wildfly_user }} group={{ wildfly_group }}
   when: not keycloak_installation.stat.exists
 
 - name: Add extension to Wildfly's configuration file
@@ -21,8 +21,8 @@
     dest: "{{ wildfly_standalone_config_path }}"
     insertbefore: </extensions>
     line: <extension module="org.keycloak.keycloak-server-subsystem"/>
-    owner: wildfly
-    group: wildfly
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
     mode: 0750
   notify:
     - restart wildfly
@@ -35,8 +35,8 @@
     line: '<subsystem xmlns="urn:jboss:domain:keycloak-server:1.1">
                <web-context>auth</web-context>
            </subsystem>'
-    owner: wildfly
-    group: wildfly
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
     mode: 0750
   notify:
     - restart wildfly
@@ -57,9 +57,14 @@
                    <password>sa</password>
                </security>
            </datasource>'
-    owner: wildfly
-    group: wildfly
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
     mode: 0750
   notify:
     - restart wildfly
     - change standalone data mode
+
+- name: Delete keycloak tar file
+  file: path={{ keycloak_download_dir }}/{{ keycloak_download_file }}
+        state=absent
+  when: not keycloak_installation.stat.exists
