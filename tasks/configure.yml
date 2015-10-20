@@ -1,0 +1,55 @@
+---
+# tasks file for keycloak
+
+- name: Add extension to Wildfly's configuration file
+  lineinfile:
+    dest: "{{ wildfly_standalone_config_path }}"
+    insertbefore: </extensions>
+    line: <extension module="org.keycloak.keycloak-server-subsystem"/>
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
+    mode: 0750
+  notify:
+    - restart wildfly
+    - change standalone data mode
+
+- name: Add subsytem to Wildfly's configuration file
+  lineinfile:
+    dest: "{{ wildfly_standalone_config_path }}"
+    insertbefore: </profile>
+    line: '<subsystem xmlns="urn:jboss:domain:keycloak-server:1.1">
+               <web-context>auth</web-context>
+           </subsystem>'
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
+    mode: 0750
+  notify:
+    - restart wildfly
+    - change standalone data mode
+
+- name: Add default datasource
+  lineinfile:
+    dest: "{{ wildfly_standalone_config_path }}"
+    insertbefore: </datasources>
+    line: '<datasource jndi-name="java:jboss/datasources/KeycloakDS"
+            pool-name="KeycloakDS" enabled="true" use-java-context="true">
+               <connection-url>
+        	       jdbc:h2:${jboss.server.data.dir}/keycloak;AUTO_SERVER=TRUE
+        	   </connection-url>
+               <driver>h2</driver>
+               <security>
+                   <user-name>sa</user-name>
+                   <password>sa</password>
+               </security>
+           </datasource>'
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
+    mode: 0750
+  notify:
+    - restart wildfly
+    - change standalone data mode
+
+- name: Delete keycloak tar file
+  file: path={{ keycloak_download_dir }}/{{ keycloak_download_file }}
+        state=absent
+  when: not keycloak_installation.stat.exists
