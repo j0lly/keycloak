@@ -5,7 +5,7 @@
   lineinfile:
     dest: "{{ wildfly_standalone_config_path }}"
     insertbefore: </extensions>
-    line: <extension module="org.keycloak.keycloak-server-subsystem"/>
+    line: "{{ keycloak_ext }}"
     owner: "{{ wildfly_user }}"
     group: "{{ wildfly_group }}"
     mode: 0750
@@ -17,9 +17,7 @@
   lineinfile:
     dest: "{{ wildfly_standalone_config_path }}"
     insertbefore: </profile>
-    line: '<subsystem xmlns="urn:jboss:domain:keycloak-server:1.1">
-               <web-context>auth</web-context>
-           </subsystem>'
+    line: "{{ keycloak_subsystem }}"
     owner: "{{ wildfly_user }}"
     group: "{{ wildfly_group }}"
     mode: 0750
@@ -31,20 +29,11 @@
   lineinfile:
     dest: "{{ wildfly_standalone_config_path }}"
     insertbefore: </datasources>
-    line: '<datasource jndi-name="java:jboss/datasources/KeycloakDS"
-            pool-name="KeycloakDS" enabled="true" use-java-context="true">
-               <connection-url>
-        	       jdbc:h2:${jboss.server.data.dir}/keycloak;AUTO_SERVER=TRUE
-        	   </connection-url>
-               <driver>h2</driver>
-               <security>
-                   <user-name>sa</user-name>
-                   <password>sa</password>
-               </security>
-           </datasource>'
+    line: "{{ keycloak_default_ds }}"
     owner: "{{ wildfly_user }}"
     group: "{{ wildfly_group }}"
     mode: 0750
+  when: keycloak_custom_ds == ""
   notify:
     - restart wildfly
     - change standalone data mode

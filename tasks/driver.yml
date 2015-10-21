@@ -1,0 +1,56 @@
+---
+# tasks file for keycloak
+
+- name: Create driver directory
+  file:
+    path: "{{ keycloak_ds_driver_path }}"
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
+    mode: 0750
+    recurse: yes
+    state: directory
+
+- name: Download driver
+  get_url:
+    url: "{{ keycloak_ds_driver_url }}"
+    dest: "{{ keycloak_ds_driver_path }}"
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
+    mode: 0750
+
+- name: Check if the driver module file exists
+  stat: path={{ keycloak_ds_driver_path }}/module.xml
+  register: keycloak_ds_driver_exists
+
+- name: Create driver module file
+  file:
+    path: "{{ keycloak_ds_driver_path }}/module.xml"
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
+    mode: 0750
+    state: touch
+  when: not keycloak_ds_driver_exists.stat.exists
+
+- name: Populate module file
+  lineinfile:
+    dest: "{{ keycloak_ds_driver_path }}/module.xml"
+    line: "{{ keycloak_ds_driver_module }}"
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
+    mode: 0750
+  when: not keycloak_ds_driver_exists.stat.exists
+  notify:
+    - restart wildfly
+    - change standalone data mode
+
+- name: Add driver to Wildfly's configuration file
+  lineinfile:
+    dest: "{{ wildfly_standalone_config_path }}"
+    insertbefore: </drivers>
+    line: "{{ keycloak_custom_driver }}"
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
+    mode: 0750
+  notify:
+    - restart wildfly
+    - change standalone data mode

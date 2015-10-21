@@ -9,3 +9,31 @@ keycloak_download_file: "{{ keycloak_name }}.tar.gz"
 keycloak_download_url: "{{ keycloak_base_download_url }}/\
                         {{ keycloak_version }}/{{ keycloak_download_file }}"
 keycloak_download_dir: /tmp
+
+keycloak_ext: <extension module="org.keycloak.keycloak-server-subsystem"/>
+keycloak_subsystem: '
+    <subsystem xmlns="urn:jboss:domain:keycloak-server:1.1">
+        <web-context>auth</web-context>
+    </subsystem>'
+
+keycloak_default_ds: '
+    <datasource jndi-name="java:jboss/datasources/KeycloakDS"
+      pool-name="KeycloakDS" enabled="true" use-java-context="true">
+        <connection-url>
+            jdbc:h2:${jboss.server.data.dir}/keycloak;AUTO_SERVER=TRUE
+        </connection-url>
+        <driver>h2</driver>
+        <security>
+            <user-name>sa</user-name>
+            <password>sa</password>
+        </security>
+    </datasource>'
+
+keycloak_ds_driver_url: ""
+keycloak_ds_driver_name: ""
+keycloak_ds_driver_path: "{{ wildfly_dir }}/modules/org/\
+                          {{ keycloak_ds_driver_name }}/main"
+keycloak_ds_driver_module: ""
+keycloak_custom_driver: ""
+
+keycloak_custom_ds: ""
