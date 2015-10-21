@@ -10,7 +10,7 @@ The default variables works just fine for a development environment.
 
 Defaults:
 
-    keycloak_version: 1.4.0.Final
+    keycloak_version: 1.6.0.Final
 
     keycloak_base_download_url: http://downloads.jboss.org/keycloak
     keycloak_name: keycloak-overlay-{{ keycloak_version }}
@@ -20,12 +20,19 @@ Defaults:
                             {{ keycloak_download_file }}"
     keycloak_download_dir: /tmp
 
+    # Standalone strings
     keycloak_ext: <extension module="org.keycloak.keycloak-server-subsystem"/>
     keycloak_subsystem: '
         <subsystem xmlns="urn:jboss:domain:keycloak-server:1.1">
             <web-context>auth</web-context>
         </subsystem>'
-
+    keycloak_cache_container: '
+        <cache-container name="keycloak" jndi-name="infinispan/Keycloak">
+            <local-cache name="realms"/>
+            <local-cache name="users"/>
+            <local-cache name="sessions"/>
+            <local-cache name="loginFailures"/>
+        </cache-container>'
     keycloak_default_ds: '
         <datasource jndi-name="java:jboss/datasources/KeycloakDS"
         pool-name="KeycloakDS" enabled="true" use-java-context="true">
@@ -39,6 +46,7 @@ Defaults:
             </security>
         </datasource>'
 
+    # Drive and datasource string
     keycloak_ds_driver_url: ""
     keycloak_ds_driver_name: ""
     keycloak_ds_driver_path: "{{ wildfly_dir }}/modules/org/\

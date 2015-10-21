@@ -25,6 +25,18 @@
     - restart wildfly
     - change standalone data mode
 
+- name: Add cache container
+  lineinfile:
+    dest: "{{ wildfly_standalone_config_path }}"
+    insertafter: '<subsystem xmlns="urn:jboss:domain:infinispan:3.0">'
+    line: "{{ keycloak_cache_container }}"
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
+    mode: 0750
+  notify:
+    - restart wildfly
+    - change standalone data mode
+
 - name: Add default datasource
   lineinfile:
     dest: "{{ wildfly_standalone_config_path }}"
