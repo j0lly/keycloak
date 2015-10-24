@@ -18,27 +18,13 @@
     group: "{{ wildfly_group }}"
     mode: 0750
 
-- name: Check if the driver module file exists
-  stat: path={{ keycloak_ds_driver_path }}/module.xml
-  register: keycloak_ds_driver_exists
-
-- name: Create driver module file
-  file:
-    path: "{{ keycloak_ds_driver_path }}/module.xml"
-    owner: "{{ wildfly_user }}"
-    group: "{{ wildfly_group }}"
-    mode: 0750
-    state: touch
-  when: not keycloak_ds_driver_exists.stat.exists
-
-- name: Populate module file
-  lineinfile:
+- name: Copy module.xml
+  template:
+    src: module.xml.j2
     dest: "{{ keycloak_ds_driver_path }}/module.xml"
-    line: "{{ keycloak_ds_driver_module }}"
     owner: "{{ wildfly_user }}"
     group: "{{ wildfly_group }}"
     mode: 0750
-  when: not keycloak_ds_driver_exists.stat.exists
   notify:
     - restart wildfly
     - change standalone data mode
