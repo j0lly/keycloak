@@ -28,7 +28,7 @@
 - name: Add cache container
   lineinfile:
     dest: "{{ wildfly_standalone_config_path }}"
-    insertafter: '<subsystem xmlns="urn:jboss:domain:infinispan:3.0">'
+    insertafter: '<subsystem xmlns="urn:jboss:domain:infinispan:(.*)">'
     line: "{{ keycloak_cache_container }}"
     owner: "{{ wildfly_user }}"
     group: "{{ wildfly_group }}"

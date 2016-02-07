@@ -1,7 +1,7 @@
 ---
 # defaults file for keycloak
 
-keycloak_version: 1.6.0.Final
+keycloak_version: 1.8.1.Final
 
 keycloak_base_download_url: http://downloads.jboss.org/keycloak
 keycloak_name: keycloak-overlay-{{ keycloak_version }}
@@ -21,6 +21,7 @@ keycloak_cache_container: '
         <local-cache name="realms"/>
         <local-cache name="users"/>
         <local-cache name="sessions"/>
+        <local-cache name="offlineSessions"/>
         <local-cache name="loginFailures"/>
     </cache-container>'
 keycloak_default_ds: '
@@ -45,3 +46,7 @@ keycloak_ds_driver_module: ""
 keycloak_custom_driver: ""
 
 keycloak_custom_ds: ""
+
+# Manually defined variables
+# keycloak_management_user: ""
+# keycloak_management_password: ""

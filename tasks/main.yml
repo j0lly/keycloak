@@ -12,3 +12,5 @@
 
 - include: datasource.yml
   when: keycloak_custom_ds != ""
+
+- include: users.yml
